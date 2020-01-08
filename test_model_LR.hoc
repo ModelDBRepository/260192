@@ -1,0 +1,70 @@
+load_file("nrngui.hoc")
+xopen("RS_neuron_tuned.hoc") 
+xopen("LR_neuron_tuned.hoc") 
+
+
+
+
+n=1
+objref cell[100],hines,g,tvec
+g = new Graph()
+tvec = new Vector()
+
+proc hines1(){
+        dt = 0.025
+        printf("%d t=%g dt=%g dreal=%g treal=%g\n", \
+                0, t, dt, startsw()-hinest2, startsw()-hinest1)
+             
+        hinest2 = startsw()
+        cvode.event(t + 1, "hines1()")
+        
+
+
+
+}
+
+proc init() {
+
+    finitialize()
+
+    if (cvode_active()) {
+        cvode.re_init()
+    } else {
+        fcurrent()
+    }
+    frecord_init()
+}
+
+
+
+for i=0,n-1{
+  
+cell[i] = new LR_neuron_tuned(1) 
+
+}
+
+
+
+
+tstop = 1500
+hinest1 = startsw()
+hinest2 = startsw()
+hines = new FInitializeHandler(2, "hinest1=startsw() hinest2=startsw() hines1()")
+finitialize()
+
+
+
+tvec.record(&t)
+
+proc runandplot() {
+  g.exec_menu("Erase") 
+  g.addexpr("LR_neuron_model",7,1)
+  run()
+  cell[0].voltagem.plot(g,tvec) 
+  g.exec_menu("View = plot") 
+}
+
+
+runandplot()
+cell[0].spiketimes.printf
+//quit()
